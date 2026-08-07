@@ -1,0 +1,8 @@
+{
+  "name": "zoom-to-youtube-automation",
+  "version": "1.0.0",
+  "main": "upload.js",
+  "dependencies": {
+    "googleapis": "^140.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-name: Download Zoom Recording & Upload to YouTube
+name: Z2Y
 
 on:
   repository_dispatch:
@@ -9,26 +9,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: Install Project Dependencies
+      - name: Install
         run: npm install
 
-      - name: Prepare Zoom URL File
+      - name: Prep URL
         run: |
           echo "${{ github.event.client_payload.zoom_url }}" > urls.txt
-          cat urls.txt
 
-      - name: Download Zoom Cloud Recording
-        run: npx zoom-rec-dl@latest
+      - name: Z R DL
+        run: npx --yes zoom-rec-dl@latest
 
-      - name: Upload Video to YouTube
+      - name: Y U
         env:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}

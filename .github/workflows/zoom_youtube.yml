@@ -36,3 +36,4 @@ jobs:
           VIDEO_DESCRIPTION: ${{ github.event.client_payload.description }}
           VIDEO_VISIBILITY: ${{ github.event.client_payload.visibility }}
         run: node upload.js
+

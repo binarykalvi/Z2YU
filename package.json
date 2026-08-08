@@ -1,5 +1,5 @@
 {
-  "name": "zoom-to-youtube-automation",
+  "name": "Z2Y",
   "version": "1.0.0",
   "main": "upload.js",
   "dependencies": {

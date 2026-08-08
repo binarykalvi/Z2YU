@@ -17,11 +17,19 @@ oauth2Client.setCredentials({ refresh_token: refresh_token });
 
 const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
+// Recursive file search to locate .mp4 inside subdirectories
 function findMp4File(dir) {
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    if (file.endsWith('.mp4')) {
-      return path.join(dir, file);
+  const items = fs.readdirSync(dir, { withFileTypes: true });
+  
+  for (const item of items) {
+    const fullPath = path.join(dir, item.name);
+    
+    // Ignore node_modules directory
+    if (item.isDirectory() && item.name !== 'node_modules' && !item.name.startsWith('.')) {
+      const found = findMp4File(fullPath);
+      if (found) return found;
+    } else if (item.isFile() && item.name.toLowerCase().endsWith('.mp4')) {
+      return fullPath;
     }
   }
   return null;
@@ -31,11 +39,11 @@ async function uploadVideo() {
   const videoPath = findMp4File(process.cwd());
   
   if (!videoPath) {
-    console.error('❌ No .mp4 file found in the working directory!');
+    console.error('❌ No .mp4 file found anywhere in the workspace directory!');
     process.exit(1);
   }
 
-  console.log(`📹 Found file to upload: ${videoPath}`);
+  console.log(`📹 Found video file: ${videoPath}`);
   console.log(`📤 Uploading to YouTube with title: "${title}" (${privacyStatus})...`);
 
   try {
@@ -58,7 +66,7 @@ async function uploadVideo() {
     console.log(`✅ Upload complete! Video ID: ${res.data.id}`);
     console.log(`🔗 Watch URL: https://youtu.be/${res.data.id}`);
   } catch (error) {
-    console.error('❌ Error uploading video:', error);
+    console.error('❌ Error uploading video to YouTube:', error);
     process.exit(1);
   }
 }

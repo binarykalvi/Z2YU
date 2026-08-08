@@ -2,10 +2,10 @@ name: Z2Y
 
 on:
   repository_dispatch:
-    types: [zoom-trigger]
+    types: [Z T]
 
 jobs:
-  download-and-upload:
+  DAU:
     runs-on: ubuntu-latest
 
     steps:

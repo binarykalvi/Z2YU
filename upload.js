@@ -33,6 +33,11 @@ function getAllMp4Files(dir, fileList = []) {
 }
 
 function filterHighestQualityVideos(allFiles) {
+  // Always upload directly if there is only 1 file
+  if (allFiles.length === 1) {
+    return allFiles;
+  }
+
   const grouped = {};
 
   for (const filePath of allFiles) {
@@ -65,6 +70,10 @@ function filterHighestQualityVideos(allFiles) {
     if (best) {
       selectedFiles.push(best);
     }
+  }
+
+  if (selectedFiles.length === 0 && allFiles.length > 0) {
+    return allFiles;
   }
 
   return selectedFiles.sort((a, b) => path.basename(a).localeCompare(path.basename(b)));

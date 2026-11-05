@@ -26,12 +26,10 @@ jobs:
 
       - name: Z R DL
         run: |
-          # 1. Resolve the share link to a play link
-          PLAY_URL=$(node resolve.js "${{ github.event.client_payload.zoom_url }}")
-          echo "Resolved play URL: $PLAY_URL"
-
-          # 2. Download using the resolved play URL
-          npx --yes @esauflores/zoom-dl "$PLAY_URL"
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip3 install --upgrade yt-dlp
+          
+          yt-dlp --no-write-subs -o "%(title)s.%(ext)s" "${{ github.event.client_payload.zoom_url }}"
 
       - name: Y U
         env:

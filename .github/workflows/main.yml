@@ -1,0 +1,63 @@
+name: Z2Y
+
+on:
+  repository_dispatch:
+    types: [Z T]
+
+jobs:
+  DAU:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install
+        run: npm install
+
+      - name: Preper URL
+        run: |
+          echo "${{ github.event.client_payload.zoom_url }}" > urls.txt
+          
+      - name: Downolder
+        run: |
+          set -eo pipefail
+
+          echo "::group::Clone + install"
+          git clone -q https://github.com/katcinskiy/zoom-downloader.git
+          cd zoom-downloader
+          pip install -q requests 'playwright>=1.64.1'
+          playwright install chromium > /dev/null 2>&1
+          echo "::endgroup::"
+
+          echo "::group::Download recording"
+          python zoom_downloader.py "${{ github.event.client_payload.zoom_url }}" \
+            > /tmp/zoom_dl.log 2>&1 || true
+
+          sed -E 's#https://[^ ]*\.mp4[^ ]*#<mp4-url-redacted>#g' /tmp/zoom_dl.log
+          echo "::endgroup::"
+
+          if [ ! -f zoom_recording.mp4 ]; then
+            echo "::error::zoom_recording.mp4 was not created."
+            echo "--- Full downloader log ---"
+            cat /tmp/zoom_dl.log
+            exit 1
+          fi
+
+          mv zoom_recording.mp4 "${{ github.workspace }}/"
+          echo "MP4 ready: $(du -h "${{ github.workspace }}/zoom_recording.mp4" | cut -f1)"
+          
+      - name: Y U
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          VIDEO_TITLE: ${{ github.event.client_payload.title }}
+          VIDEO_DESCRIPTION: ${{ github.event.client_payload.description }}
+          VIDEO_VISIBILITY: ${{ github.event.client_payload.visibility }}
+        run: node upload.js

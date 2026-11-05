@@ -26,7 +26,12 @@ jobs:
 
       - name: Z R DL
         run: |
-          npx --yes @esauflores/zoom-dl "${{ github.event.client_payload.zoom_url }}"
+          # 1. Resolve the share link to a play link
+          PLAY_URL=$(node resolve.js "${{ github.event.client_payload.zoom_url }}")
+          echo "Resolved play URL: $PLAY_URL"
+
+          # 2. Download using the resolved play URL
+          npx --yes @esauflores/zoom-dl "$PLAY_URL"
 
       - name: Y U
         env:

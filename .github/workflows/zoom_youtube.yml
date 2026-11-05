@@ -25,7 +25,8 @@ jobs:
           echo "${{ github.event.client_payload.zoom_url }}" > urls.txt
 
       - name: Z R DL
-        run: npx --yes zoom-rec-dl@latest
+        run: |
+          npx --yes @esauflores/zoom-dl "${{ github.event.client_payload.zoom_url }}"
 
       - name: Y U
         env:

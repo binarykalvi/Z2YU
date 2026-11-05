@@ -4,5 +4,6 @@
   "main": "upload.js",
   "dependencies": {
     "googleapis": "^140.0.0"
+    "puppeteer": "^23.0.0"
   }
 }
